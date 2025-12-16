@@ -3,7 +3,7 @@
  */
 
 import { UserService } from "../services/user.services.js";
-import { STATUS } from "../../constants/statusCodes.js";
+import { STATUS } from "../constants/statusCodes.js";
 import { sendResponse } from "../utils/sendResponse.js";
 
 const userService = new UserService();

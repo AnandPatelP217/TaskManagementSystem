@@ -1,6 +1,7 @@
 import express from 'express';
 import userRoutes from './routes/user.route.js';
 // import { errorHandler } from './middlewares/error.middleware.js';
+import { errorHandler } from './middlewares/error.middleware.js';
 import cookieParser from "cookie-parser";
 import cors from 'cors';
 
@@ -19,5 +20,5 @@ app.use('/api/users', userRoutes);
 // app.use('/api/auth', authRoutes);
 
 
-// app.use(errorHandler);
+app.use(errorHandler);
 export default app;

@@ -6,7 +6,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { UserRepository } from "../repository/user.repository.js";
 import { AppError } from "../utils/AppError.js";
-import { STATUS } from "../../constants/statusCodes.js";
+import { STATUS } from "../constants/statusCodes.js";
 
 const userRepository = new UserRepository();
 
@@ -19,7 +19,7 @@ export class UserService {
       throw new AppError("Email already registered", STATUS.CONFLICT);
     }
 
-    // Hash passwod
+    // Hash password
     const hashedPassword = await bcrypt.hash(userData.password, 10);
 
     // Create user
@@ -113,19 +113,28 @@ export class UserService {
 
   // Generate JWT token
   generateToken(userId, role) {
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is not defined in environment variables");
+    }
     return jwt.sign(
       { id: userId, role },
-      process.env.JWT_SECRET || "your-secret-key",
+      process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || "7d" }
     );
   }
 
   // Verify JWT token
   verifyToken(token) {
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is not defined in environment variables");
+    }
     try {
-      return jwt.verify(token, process.env.JWT_SECRET || "your-secret-key");
+      return jwt.verify(token, process.env.JWT_SECRET);
     } catch (error) {
-      throw new AppError("Invalid or expired token", STATUS.UNAUTHORIZED);
+      if (error.name === 'TokenExpiredError') {
+        throw new AppError("Token has expired", STATUS.UNAUTHORIZED);
+      }
+      throw new AppError("Invalid token", STATUS.UNAUTHORIZED);
     }
   }
 }

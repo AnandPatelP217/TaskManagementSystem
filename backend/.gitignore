@@ -1,0 +1,32 @@
+# Dependencies
+/node_modules
+
+# Environment variables
+# Never commit .env files with sensitive credentials
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+dist
+build
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Test reports
+coverage

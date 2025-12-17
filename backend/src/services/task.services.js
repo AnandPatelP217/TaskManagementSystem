@@ -141,4 +141,36 @@ export class TaskService {
     const updatedTask = await taskRepository.updatePriority(taskId, priority);
     return updatedTask;
   }
+
+  // Get tasks assigned to logged-in user
+  async getMyTasks(userId, queryParams) {
+    const { page = 1, limit = 10 } = queryParams;
+    return await taskRepository.findByAssignedUser(userId, page, limit);
+  }
+
+  // Assign task to a user (admin only)
+  async assignTaskToUser(taskId, userId, adminRole) {
+    if (adminRole !== "admin") {
+      throw new AppError("Only admins can assign tasks", STATUS.FORBIDDEN);
+    }
+
+    // Verify task exists
+    const task = await taskRepository.findById(taskId);
+    if (!task) {
+      throw new AppError("Task not found", STATUS.NOT_FOUND);
+    }
+
+    // Verify user exists
+    const userExists = await userRepository.findById(userId);
+    if (!userExists) {
+      throw new AppError("User not found", STATUS.NOT_FOUND);
+    }
+    
+    return await taskRepository.updateById(taskId, { assignedTo: userId });
+  }
+
+  // Filter tasks by status and/or priority
+  async filterTasks(filters) {
+    return await taskRepository.findByFilters(filters);
+  }
 }

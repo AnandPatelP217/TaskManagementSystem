@@ -123,4 +123,50 @@ export class TaskController {
       next(error);
     }
   }
+
+  // Get tasks assigned to logged-in user
+  async getMyTasks(req, res, next) {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const result = await taskService.getMyTasks(req.user.id, { page, limit });
+      sendResponse(res, STATUS.OK, "My tasks retrieved successfully", result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Assign task to a user (admin only)
+  async assignTask(req, res, next) {
+    try {
+      const { userId } = req.body;
+      if (!userId) {
+        throw new AppError("User ID is required", STATUS.BAD_REQUEST);
+      }
+
+      const task = await taskService.assignTaskToUser(
+        req.params.id,
+        userId,
+        req.user.role
+      );
+      sendResponse(res, STATUS.OK, "Task assigned successfully", task);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Filter tasks by status and/or priority
+  async filterTasks(req, res, next) {
+    try {
+      const filters = {};
+      if (req.query.status) filters.status = req.query.status;
+      if (req.query.priority) filters.priority = req.query.priority;
+
+      const tasks = await taskService.filterTasks(filters);
+      sendResponse(res, STATUS.OK, "Filtered tasks retrieved successfully", tasks);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

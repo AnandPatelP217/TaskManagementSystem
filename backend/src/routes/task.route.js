@@ -18,6 +18,16 @@ const taskController = new TaskController();
 
 router.use(authenticate);
 
+// Get tasks assigned to logged-in user
+router.get("/my-tasks", (req, res, next) => 
+  taskController.getMyTasks(req, res, next)
+);
+
+// Filter tasks by status and/or priority
+router.get("/filter", (req, res, next) =>
+  taskController.filterTasks(req, res, next)
+);
+
 router.post(
   "/",
   authorizeAdmin,
@@ -50,6 +60,11 @@ router.patch(
   "/:id/priority",
   validate(updatePrioritySchema),
   (req, res, next) => taskController.updateTaskPriority(req, res, next)
+);
+
+// Assign task to user (admin only)
+router.put("/:id/assign", authorizeAdmin, (req, res, next) =>
+  taskController.assignTask(req, res, next)
 );
 
 export default router;

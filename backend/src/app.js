@@ -1,7 +1,6 @@
 import express from 'express';
 import userRoutes from './routes/user.route.js';
 import taskRoutes from './routes/task.route.js';
-// import { errorHandler } from './middlewares/error.middleware.js';
 import { errorHandler } from './middlewares/error.middleware.js';
 import cookieParser from "cookie-parser";
 import cors from 'cors';

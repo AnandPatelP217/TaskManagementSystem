@@ -100,4 +100,42 @@ export class TaskRepository {
       .populate("assignedTo", "name email")
       .populate("createdBy", "name email");
   }
+
+  // Find tasks assigned to a specific user (for my-tasks endpoint)
+  async findByAssignedUser(userId, page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+    
+    const tasks = await Task.find({ assignedTo: userId })
+      .populate("assignedTo", "name email")
+      .populate("createdBy", "name email")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+    
+    const total = await Task.countDocuments({ assignedTo: userId });
+    
+    return {
+      tasks,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(total / limit),
+        totalTasks: total,
+        hasNext: page < Math.ceil(total / limit),
+        hasPrev: page > 1,
+      }
+    };
+  }
+
+  // Find tasks by filters (status, priority)
+  async findByFilters(filters) {
+    const query = {};
+    if (filters.status) query.status = filters.status;
+    if (filters.priority) query.priority = filters.priority;
+    if (filters.assignedTo) query.assignedTo = filters.assignedTo;
+    
+    return await Task.find(query)
+      .populate("assignedTo", "name email")
+      .populate("createdBy", "name email")
+      .sort({ createdAt: -1 });
+  }
 }
